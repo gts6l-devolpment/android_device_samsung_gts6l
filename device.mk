@@ -1,61 +1,44 @@
 #
-# SPDX-FileCopyrightText: The LineageOS Project
+# SPDX-FileCopyrightText: 2026 The LineageOS Project
 # SPDX-License-Identifier: Apache-2.0
 #
 
-# API levels
-PRODUCT_SHIPPING_API_LEVEL := 28
+TARGET_IS_TABLET := true
 
-# Health
+# Inherit from sm8150-common
+$(call inherit-product, device/samsung/sm8150-common/common.mk)
+
+# AAPT
+PRODUCT_AAPT_CONFIG := normal
+PRODUCT_AAPT_PREF_CONFIG := xhdpi
+
+# Audio configs
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/audio/audio_platform_info_diff.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_platform_info_diff.xml \
+    $(LOCAL_PATH)/configs/audio/mixer_paths.xml:$(TARGET_COPY_OUT_VENDOR)/etc/mixer_paths.xml
+
+# Boot animation
+TARGET_SCREEN_HEIGHT := 1600
+TARGET_SCREEN_WIDTH := 2560
+
+# Init files
 PRODUCT_PACKAGES += \
-    android.hardware.health@2.1-impl \
-    android.hardware.health@2.1-impl.recovery \
-    android.hardware.health@2.1-service
+    init.gts6l.rc
 
-# Overlays
-PRODUCT_ENFORCE_RRO_TARGETS := *
+# Overlay
+DEVICE_PACKAGE_OVERLAYS += \
+    $(LOCAL_PATH)/overlay
 
-# Product characteristics
-PRODUCT_CHARACTERISTICS := tablet
+# Recovery
+$(call soong_config_set_bool,recovery,target_recovery_uses_qti_drm,true)
 
-# Rootdir
-PRODUCT_PACKAGES += \
-    init.class_main.sh \
-    init.crda.sh \
-    init.mdm.sh \
-    init.qcom.class_core.sh \
-    init.qcom.coex.sh \
-    init.qcom.early_boot.sh \
-    init.qcom.efs.sync.sh \
-    init.qcom.post_boot.sh \
-    init.qcom.sdio.sh \
-    init.qcom.sensors.sh \
-    init.qcom.sh \
-    init.qcom.usb.sh \
-    init.qti.chg_policy.sh \
-    init.qti.dcvs.sh \
-    init.qti.keymaster.sh \
-    init.qti.qcv.sh \
-    install-recovery.sh \
-    qca6234-service.sh \
+# Sensors
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/sensors/hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/hals.conf
 
-PRODUCT_PACKAGES += \
-    fstab.qcom \
-    init.gts6l.rc \
-    init.qcom.factory.rc \
-    init.qcom.rc \
-    init.qcom.usb.rc \
-    init.qti.ufs.rc \
-    init.samsung.bsp.rc \
-    init.samsung.display.rc \
-    init.samsung.rc \
-    init.target.rc \
-    init.recovery.qcom.rc \
-    init.recovery.samsung.rc \
-
-# Soong namespaces
+# Soong Namespaces
 PRODUCT_SOONG_NAMESPACES += \
     $(LOCAL_PATH)
 
-# Inherit the proprietary files
-$(call inherit-product, vendor/samsung/gts6l/gts6l-vendor.mk)
+# Inherit from vendor blobs
+$(call inherit-product-if-exists, vendor/samsung/gts6l/gts6l-vendor.mk)
